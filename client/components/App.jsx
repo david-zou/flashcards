@@ -8,8 +8,7 @@ import {
 } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
 
-import NavGuest from './Nav/Nav-guest.jsx';
-import NavUser from './Nav/Nav-user.jsx';
+import Nav from './Nav/Nav.jsx';
 import Display from './Display/Display.jsx';
 import Landing from './Landing/Landing.jsx';
 import Edit from './Edit/Edit.jsx';
@@ -20,8 +19,13 @@ import Voice from './Voice/Voice.jsx';
 import Login from './Login/Login.jsx';
 import Register from './Register/Register.jsx';
 
+import FacebookLogin from 'react-facebook-login';
+
 import { connect } from 'react-redux';
 import * as actions from '../actions/appActions.js';
+
+import { FACEBOOK_APP_ID } from '../../config/config.js';
+
 // Allows redirection from current page to Search page upon search submission
 let TargetRoute = () => ( <Redirect from='/' to='/' /> );
 
@@ -52,7 +56,7 @@ class App extends Component {
     if (location.pathname.startsWith('/id=')) {
       console.log('DETECTED SHORTENED LINK:', location.pathname.slice(4, location.pathname.length));
       this.props.getShortenerId(location.pathname.slice(4, location.pathname.length));
-      TargetRoute = () => ( <Redirect to='/display' /> )
+      // TargetRoute = () => ( <Redirect to='/display' /> )
     } else if (location.pathname === '/edit' || location.pathname === '/Edit' || location.pathname === '/create' || location.pathname === '/Create') {
       TargetRoute = () => ( <Redirect to='/edit' /> )
     } else if (location.pathname === '/user' || location.pathname === '/User' || location.pathname === '/home' || location.pathname === '/Home') {
@@ -60,6 +64,8 @@ class App extends Component {
     } else if (location.pathname === '/explore' || location.pathname === '/Explore') {
       TargetRoute = () => ( <Redirect to='/explore' /> )
     }
+
+    this.responseFacebook = this.responseFacebook.bind(this);
   }
 
   // gets called when user pushes the submit button or presses enter
@@ -98,9 +104,18 @@ class App extends Component {
   //   });
   // }
 
+  responseFacebook(response) {
+    console.log('Facebook response', response);
+  }
+
   render() {
 
     // triggers a redirection to Search page if 'searchActive' state is triggered from submission action
+
+    if (this.props.gotShortenerId) {
+      TargetRoute = () => ( <Redirect to='/display' /> );
+    }
+
     if (this.props.searchActive) {
       TargetRoute = () => (<Redirect to="/search" />);
     }
@@ -109,7 +124,7 @@ class App extends Component {
       <div>
         <Router history={createBrowserHistory()}>
           <div>
-            <NavGuest />
+            <Nav />
             <TargetRoute />
             <Route exact path="/" component={Landing} />
             <Route path="/display" component={Display} />
@@ -123,6 +138,20 @@ class App extends Component {
             {/*<Route path="/voice" component={Voice} />*/}
           </div>
         </Router>
+        <script>
+          {(function(d, s, id) {
+              var js, fjs = d.getElementsByTagName(s)[0];
+              if (d.getElementById(id)) return;
+              js = d.createElement(s); js.id = id;
+              js.src = `//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.9&appId=${FACEBOOK_APP_ID}`;
+              fjs.parentNode.insertBefore(js, fjs);
+          }(document, 'script', 'facebook-jssdk'))}
+        </script>
+        {/*<script>
+          {(FB.getLoginStatus(function(response) {
+            console.log('FB.getLoginStatus', response);
+          }))}
+        </script>*/}
       </div>
     );
   }
@@ -131,6 +160,7 @@ class App extends Component {
 function mapStateToProps(state) {
   return {
     shortenerId: state.appReducer.shortenerId,
+    gotShortenerId: state.appReducer.gotShortenerId,
     query: state.appReducer.query,
     userId: state.appReducer.userId,
     bentoId: state.appReducer.bentoId,

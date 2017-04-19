@@ -7,6 +7,9 @@ import RichTextEditor from 'react-rte';
 import {convertFromRaw, convertToRaw, ContentState, Editor, EditorState} from 'draft-js';
 import displayActions from '../../actions/displayActions.js';
 import { connect } from 'react-redux';
+import { clearShortenerId } from '../../actions/appActions.js';
+
+console.log('clearShortenerId:', clearShortenerId);
 
 class Display extends Component {
   constructor(props) {
@@ -129,11 +132,12 @@ class Display extends Component {
 
   }
 
-  componentDidUpdate() {
+  componentDidMount() {
   }
 
   componentWillUnmount() {
     window.removeEventListener('keydown', this.handleKeyDown);
+    this.props.clearShortenerId();
   }
 
   render() {
@@ -229,4 +233,4 @@ function mapStateToProps(state) {
   }
 }
 
-export default connect(mapStateToProps, displayActions)(Display);
+export default connect(mapStateToProps, { ...displayActions, clearShortenerId })(Display);
