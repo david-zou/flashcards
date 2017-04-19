@@ -4,12 +4,16 @@ import { Navbar, Nav, NavItem, NavDropdown, FormGroup, FormControl, MenuItem, Bu
 import { connect } from 'react-redux';
 import * as actions from '../../actions/navActions.js';
 import { handleNavSearch } from '../../actions/appActions.js';
+import FacebookLogin from 'react-facebook-login';
+import { FACEBOOK_APP_ID } from '../../../config/config.js';
 
 class NavigationGuest extends Component {
   constructor(props) {
     super(props);
 
   this.handleBringUpInput = this.handleBringUpInput.bind(this);   
+
+  this.responseFacebook = this.responseFacebook.bind(this);
   }
   
   // brings up the 'input' to App and will assign to 'query'
@@ -19,6 +23,10 @@ class NavigationGuest extends Component {
     return function(event) {
       context.props.bringUpInput(event, input);
     }
+  }
+
+  responseFacebook(response) {
+    console.log('response from fb:', response);
   }
 
   render() {
@@ -55,7 +63,7 @@ class NavigationGuest extends Component {
             </form>
 
             {/* Profile Dropdown Menu */}
-            <ul className="nav navbar-nav navbar-right">
+            {/*<ul className="nav navbar-nav navbar-right">
               <li className="dropdown">
                 <a href="#" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                   <span className="glyphicon glyphicon-user" aria-hidden="true"></span> Menu<span className="caret"></span>
@@ -64,11 +72,25 @@ class NavigationGuest extends Component {
                   <li><Link to="Login"><span className="glyphicon glyphicon-log-in" aria-hidden="true"></span> Log In</Link></li>
                 </ul>
               </li>
-            </ul>
-
+            </ul>*/}
+            <div className="nav navbar-nav nav-bar-right">
+              <FacebookLogin
+                appId={`${FACEBOOK_APP_ID}`}
+                autoLoad={true}
+                fields="name,email,picture"
+                callback={this.responseFacebook} />
+            </div>
           {/* End of bar collapse container */}
           </div>
-
+          <div id="fb-root"></div>
+          
+          <script>{(function(d, s, id) {
+                    var js, fjs = d.getElementsByTagName(s)[0];
+                    if (d.getElementById(id)) return;
+                    js = d.createElement(s); js.id = id;
+                    js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.9&appId=304680909966820";
+                    fjs.parentNode.insertBefore(js, fjs);
+                  }(document, 'script', 'facebook-jssdk'))}</script>
         {/* End of nav bar container */}
         </div>
       </nav>
@@ -85,34 +107,3 @@ function mapStateToProps(state) {
 }
 
 export default connect(mapStateToProps, { ...actions, handleNavSearch })(NavigationGuest);
-
-        /*<Navbar collapseOnSelect fixedTop active activeKey activeHref>
-        <Navbar.Header>
-          <Navbar.Brand>
-            <Link to="/">Obento</Link>
-          </Navbar.Brand>
-          <Navbar.Toggle />
-        </Navbar.Header>
-        <Navbar.Collapse>
-          <Nav>
-            <NavItem eventKey={1}><Link to="/User"><span className="glyphicon glyphicon-home" aria-hidden="true"></span>User</Link></NavItem>
-            <NavItem eventKey={2}><Link to="/Edit"><span className="glyphicon glyphicon-pencil" aria-hidden="true"></span>Create/Edit</Link></NavItem>
-            <form className="navbar-form navbar-left" onSubmit={this.bringUpInput(this.state.input)}>
-              <FormGroup>
-                <FormControl type="text" value={this.state.input} placeholder="Find A Bento Here" onChange={this.handleNavSearch} />
-              </FormGroup>
-              {' '}
-              <Button type="submit"><span className="glyphicon glyphicon-search" aria-hidden="true"></span>Search</Button>
-            </form>
-          </Nav>
-          <Nav pullRight>
-            <Glyphicon glyph="user" />
-            <NavDropdown eventKey={1} title="Profile" id="basic-nav-dropdown">
-              <MenuItem eventKey={1.1}><span className="glyphicon glyphicon-th" aria-hidden="true"></span>Personal</MenuItem>
-              <MenuItem eventKey={1.2}><span className="glyphicon glyphicon-cog" aria-hidden="true"></span>Settings</MenuItem>
-              <MenuItem divider />
-              <MenuItem eventKey={1.3}><span className="glyphicon glyphicon-log-out" aria-hidden="true"></span>Log Out</MenuItem>
-            </NavDropdown>
-          </Nav>
-        </Navbar.Collapse>
-      </Navbar>*/
