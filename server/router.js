@@ -66,6 +66,21 @@ const bindRoutes = (app) => {
   app.route('/api/sms')
     .post(util.tasks.sms.post);
 
+  // app.route('/login/facebook')
+  //   .get(passport.authenticate('facebook'));
+
+  // app.route('/login/facebook/return')
+  //   .get(passport.authenticate('facebook', { failureRedirect: '/login' }),
+  //       (req, res) => {
+  //         res.redirect('/');
+  //       });
+
+  // app.route('/profile')
+  //   .get(require('connect-ensure-login').ensureLoggedIn(),
+  //     (req, res) => {
+  //       res.render('profile', { user: req.user });
+  //     });
+
   app.route('/api/login')
      /* GET login page. */
     .get((req, res) =>

@@ -9,8 +9,6 @@ import displayActions from '../../actions/displayActions.js';
 import { connect } from 'react-redux';
 import { clearShortenerId } from '../../actions/appActions.js';
 
-console.log('clearShortenerId:', clearShortenerId);
-
 class Display extends Component {
   constructor(props) {
     super(props);

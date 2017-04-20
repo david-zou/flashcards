@@ -1,19 +1,19 @@
 import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router-dom';
-import { Navbar, Nav, NavItem, NavDropdown, FormGroup, FormControl, MenuItem, Button, Dropdown, Glyphicon } from 'react-bootstrap';
+import { createBrowserHistory } from 'history';
 import { connect } from 'react-redux';
 import * as actions from '../../actions/navActions.js';
 import { handleNavSearch } from '../../actions/appActions.js';
-import FacebookLogin from 'react-facebook-login';
+import { handleFacebookLogin, handleFacebookLogout } from '../../actions/authActions.js';
+import { FacebookLogin } from 'react-facebook-login-component';
 import { FACEBOOK_APP_ID } from '../../../config/config.js';
 
-class NavigationGuest extends Component {
+class Nav extends Component {
   constructor(props) {
     super(props);
 
-  this.handleBringUpInput = this.handleBringUpInput.bind(this);   
-
-  this.responseFacebook = this.responseFacebook.bind(this);
+    this.handleBringUpInput = this.handleBringUpInput.bind(this);
+    this.responseFacebook = this.responseFacebook.bind(this);
   }
   
   // brings up the 'input' to App and will assign to 'query'
@@ -27,6 +27,9 @@ class NavigationGuest extends Component {
 
   responseFacebook(response) {
     console.log('response from fb:', response);
+    if (response) {
+      this.props.handleFacebookLogin(response);
+    }
   }
 
   render() {
@@ -49,7 +52,9 @@ class NavigationGuest extends Component {
           <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             
             <ul className="nav navbar-nav">
-              <li><Link to="/Explore" onSelect={this.closeNav}><span className="glyphicon glyphicon-home" aria-hidden="true"></span> Explore</Link></li>
+              {!this.props.isLoggedIn ? (<li><Link to="/Explore" onSelect={this.closeNav}><span className="glyphicon glyphicon-home" aria-hidden="true"></span> Explore</Link></li>)
+               : (<li><Link to="/Home" onSelect={this.closeNav}><span className="glyphicon glyphicon-home" aria-hidden="true"></span> Home</Link></li>) }
+              {/*<li><Link to="/Explore" onSelect={this.closeNav}><span className="glyphicon glyphicon-home" aria-hidden="true"></span> Explore</Link></li>*/}
               <li><Link to="/Edit"onClick = {()=> {this.props.handleRenderCreatePage()}} onSelect={this.closeNav}><span className="glyphicon glyphicon-pencil" aria-hidden="true"></span> Create</Link></li>
               {/*<li><Link to="/Voice" onSelect={this.closeNav}><span className="glyphicon glyphicon-record" aria-hidden="true"></span> Voice</Link></li>*/}
             </ul>            
@@ -61,36 +66,24 @@ class NavigationGuest extends Component {
               </div>
               <button type="submit" className="btn btn-default"><span className="glyphicon glyphicon-search" aria-hidden="true"></span> Search</button>
             </form>
-
-            {/* Profile Dropdown Menu */}
-            {/*<ul className="nav navbar-nav navbar-right">
-              <li className="dropdown">
-                <a href="#" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                  <span className="glyphicon glyphicon-user" aria-hidden="true"></span> Menu<span className="caret"></span>
-                </a>
-                <ul className="dropdown-menu">
-                  <li><Link to="Login"><span className="glyphicon glyphicon-log-in" aria-hidden="true"></span> Log In</Link></li>
-                </ul>
-              </li>
-            </ul>*/}
-            <div className="nav navbar-nav nav-bar-right">
-              <FacebookLogin
-                appId={`${FACEBOOK_APP_ID}`}
+            {!this.props.isLoggedIn ? (<ul className="nav navbar-nav navbar-right">
+              <FacebookLogin socialId={FACEBOOK_APP_ID}
+                language="en_US"
                 autoLoad={true}
                 fields="name,email,picture"
-                callback={this.responseFacebook} />
-            </div>
+                responseHandler={this.responseFacebook}
+                xfbml={true}
+                version="v2.9"
+                class="btn btn-primary navbar-btn"
+                buttonText="Login with Facebook"
+              />
+            </ul>) : (
+              <ul className="nav navbar-nav navbar-right">
+                <a className='btn btn-primary navbar-btn' onClick={() => FB.logout((response) => { console.log(response); this.props.handleFacebookLogout(response); })}>Logout</a>
+              </ul>
+            )}  
           {/* End of bar collapse container */}
           </div>
-          <div id="fb-root"></div>
-          
-          <script>{(function(d, s, id) {
-                    var js, fjs = d.getElementsByTagName(s)[0];
-                    if (d.getElementById(id)) return;
-                    js = d.createElement(s); js.id = id;
-                    js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.9&appId=304680909966820";
-                    fjs.parentNode.insertBefore(js, fjs);
-                  }(document, 'script', 'facebook-jssdk'))}</script>
         {/* End of nav bar container */}
         </div>
       </nav>
@@ -103,7 +96,20 @@ function mapStateToProps(state) {
   return { 
     input: state.navReducer.input,
     userId: state.appReducer.userId,
+    isLoggedIn: state.authReducer.isLoggedIn,
   };
 }
 
-export default connect(mapStateToProps, { ...actions, handleNavSearch })(NavigationGuest);
+export default connect(mapStateToProps, { ...actions, handleNavSearch, handleFacebookLogin, handleFacebookLogout })(Nav);
+
+/* Profile Dropdown Menu */
+    {/*<ul className="nav navbar-nav navbar-right">
+      <li className="dropdown">
+        <a href="#" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+          <span className="glyphicon glyphicon-user" aria-hidden="true"></span> Menu<span className="caret"></span>
+        </a>
+        <ul className="dropdown-menu">
+          <li><Link to="Login"><span className="glyphicon glyphicon-log-in" aria-hidden="true"></span> Log In</Link></li>
+        </ul>
+      </li>
+    </ul>*/}

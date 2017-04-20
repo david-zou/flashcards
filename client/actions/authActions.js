@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { LOG_IN, LOG_OUT, SIGN_UP, HANDLE_EMAIL_INPUT, HANDLE_PASSWORD_INPUT, CLEAR_AUTH_INPUTS } from './actionTypes';
+import { LOG_IN, LOG_OUT, SIGN_UP, HANDLE_EMAIL_INPUT, HANDLE_PASSWORD_INPUT, CLEAR_AUTH_INPUTS, CHECK_SESSION } from './actionTypes';
 
 export function handleEmailInput(input) {
   return function (dispatch) {
@@ -61,5 +61,69 @@ export function checkSignup(email, password) {
     // });
   };
 }
+
+export function handleFacebookLogin(user) {
+  return function (dispatch) {
+    return axios.get('/auth/facebook', {
+      params: user,
+    })
+    .then((response) => {
+      console.log('Response from facebookLogin:', response);
+      dispatch({
+        type: LOG_IN,
+        isLoggedIn: true,
+        payload: response,
+      });
+    })
+    .catch((err) => {
+      console.error('Error on login:', err);
+    });
+  };
+}
+
+export function handleFacebookLogout(user) {
+  return function (dispatch) {
+    return axios.get('/unlink/facebook', {
+      params: user,
+    })
+    .then((response) => {
+      console.log('Response from facebookLogout:', response);
+      dispatch({
+        type: LOG_OUT,
+        isLoggedIn: false,
+        payload: response,
+      });
+    })
+    .catch((err) => {
+      console.error('Error on logout:', err);
+    });
+    // dispatch({
+    //   type: LOG_OUT,
+    //   isLoggedIn: false
+    // });
+  };
+}
+
+// export function checkFacebookSession(user) {
+//   return function (dispatch) {
+//     return axios.get('/auth/facebook', {
+//       params: user,
+//     })
+//     .then((response) => {
+//       console.log('Response from checkFacebookSession:', response);
+//       dispatch({
+//         type: CHECK_SESSION,
+//         status: response,
+//       });
+//     })
+//     .catch((err) => {
+//       console.error('Error on checkSession:', err);
+//     });
+//     // dispatch({
+//     //   type: LOG_OUT,
+//     //   isLoggedIn: false
+//     // });
+//   };
+// }
 
 

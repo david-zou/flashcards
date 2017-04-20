@@ -3,6 +3,8 @@ import { LOG_IN, LOG_OUT, SIGN_UP, HANDLE_EMAIL_INPUT, HANDLE_PASSWORD_INPUT, CL
 const stateDefault = {
   emailAddress: '',
   password: '',
+  isLoggedIn: false,
+  userData: null,
 };
 
 const reduceEmailInput = (state, action) => {
@@ -14,27 +16,29 @@ const reducePasswordInput = (state, action) => {
 };
 
 const reduceClearAuthInputs = (state, action) => {
-  return { emailAddress: action.emailAddress, password: action.password };
+  return { ...state, emailAddress: action.emailAddress, password: action.password };
 };
 
 const reduceLogin = (state, action) => {
   return {
-    emailAddress: action.emailAddress,
-    password: action.password,
+    ...state,
+    isLoggedIn: action.isLoggedIn,
+    userData: action.payload,
   };
 };
 
 const reduceLogout = (state, action) => {
   return {
-    emailAddress: action.emailAddress,
-    password: action.password,
+    ...state,
+    isLoggedIn: action.isLoggedIn,
+    userData: action.payload,
   };
 };
 
 const reduceSignup = (state, action) => {
   return {
-    emailAddress: action.emailAddress,
-    password: action.password,
+    ...state,
+    isLoggedIn: action.isLoggedIn,
   };
 };
 

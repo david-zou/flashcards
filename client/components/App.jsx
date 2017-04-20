@@ -131,8 +131,7 @@ class App extends Component {
             <Route path="/landing" component={Landing} />
             <Route path="/edit" component={Edit} />
             <Route path="/search" component={() => <Search />} />
-            <Route path="/explore" component={Explore} />
-            <Route path="/user" component={User} />
+            { !this.props.isLoggedIn ? (<Route path="/explore" component={Explore} />) : (<Route path="/home" component={User} />) }
             <Route path="/login" component={Login} />
             <Route path="/register" component={Register} />
             {/*<Route path="/voice" component={Voice} />*/}
@@ -165,6 +164,7 @@ function mapStateToProps(state) {
     userId: state.appReducer.userId,
     bentoId: state.appReducer.bentoId,
     searchActive: state.appReducer.searchActive,
+    isLoggedIn: state.authReducer.isLoggedIn,
   };
 }
 
